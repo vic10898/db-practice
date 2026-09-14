@@ -34,7 +34,7 @@ if __name__ == "__main__":
     test_cases = [0, 9999, 10000, 49999, 50000, 299999, 300000, 500000]
     print("Демонстрация расчета скидок для партнеров:")
     print("-" * 45)
-    print(f"{"Объем (ед.)":<15} | {"Скидка (%)":<10}")
+    print(f"{'Объем (ед.)':<15} | {'Скидка (%)':<10}")
     print("-" * 45)
     for qty in test_cases:
         discount = calculate_partner_discount(qty)
