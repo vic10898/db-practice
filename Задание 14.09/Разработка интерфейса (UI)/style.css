@@ -1,0 +1,119 @@
+/* Базовые стили приложения */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f4f6f9;
+    color: #1f2937;
+    line-height: 1.5;
+}
+
+/* Шапка приложения */
+.app-header {
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 12px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.company-logo {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+}
+
+.page-title {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Кнопки управления */
+.btn {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 18px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background-color: #2a73c6;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #1e5ba3;
+}
+
+/* Основной контейнер */
+.container {
+    max-width: 900px;
+    margin: 25px auto;
+    padding: 0 20px;
+}
+
+/* Список карточек партнеров */
+.partners-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+/* Карточка партнера (строго по макету Screenshot_2) */
+.partner-card {
+    background-color: #ffffff;
+    border: 1px solid #9ca3af;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* Верхняя строка: Заголовок и Скидка */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.partner-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+.partner-discount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Блок информации карточки */
+.card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.card-body p {
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+.card-body .director {
+    color: #1f2937;
+}

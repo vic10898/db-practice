@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM: Список партнеров и скидок</title>
+    <link rel="icon" type="image/png" href="resources/icon.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Шапка страницы -->
+    <header class="app-header">
+        <div class="header-left">
+            <img src="resources/logo.png" alt="Логотип компании" class="company-logo">
+            <h1 class="page-title">Список партнеров</h1>
+        </div>
+        <div class="header-right">
+            <button id="refreshBtn" class="btn btn-primary" onclick="loadPartners()">Обновить данные</button>
+        </div>
+    </header>
+
+    <!-- Основной контейнер со списком карточек -->
+    <main class="container">
+        <div id="partnersList" class="partners-list">
+            <!-- Пример карточки 1 (согласно макету Screenshot_2) -->
+            <div class="partner-card">
+                <div class="card-header">
+                    <span class="partner-name">ООО | Логистик-Экспресс</span>
+                    <span class="partner-discount">0%</span>
+                </div>
+                <div class="card-body">
+                    <p class="director">Директор: Иванов И.И.</p>
+                    <p class="phone">+7 (999) 111-22-33</p>
+                    <p class="rating">Рейтинг: 10</p>
+                </div>
+            </div>
+
+            <!-- Пример карточки 2 -->
+            <div class="partner-card">
+                <div class="card-header">
+                    <span class="partner-name">ИП | Петров А.В.</span>
+                    <span class="partner-discount">5%</span>
+                </div>
+                <div class="card-body">
+                    <p class="director">Директор: Петров А.В.</p>
+                    <p class="phone">+7 (999) 000-00-00</p>
+                    <p class="rating">Рейтинг: 10</p>
+                </div>
+            </div>
+
+            <!-- Пример карточки 3 -->
+            <div class="partner-card">
+                <div class="card-header">
+                    <span class="partner-name">ТК | Быстрый Путь</span>
+                    <span class="partner-discount">10%</span>
+                </div>
+                <div class="card-body">
+                    <p class="director">Директор: Сидоров С.С.</p>
+                    <p class="phone">+78125554433</p>
+                    <p class="rating">Рейтинг: 10</p>
+                </div>
+            </div>
+
+            <!-- Пример карточки 4 -->
+            <div class="partner-card">
+                <div class="card-header">
+                    <span class="partner-name">ООО | Новый Партнер</span>
+                    <span class="partner-discount">0%</span>
+                </div>
+                <div class="card-body">
+                    <p class="director">Директор: Кузнецов К.К.</p>
+                    <p class="phone">+7 (999) 444-55-66</p>
+                    <p class="rating">Рейтинг: 10</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Асинхронное получение данных из API (если сервер api.py запущен)
+        async function loadPartners() {
+            try {
+                const response = await fetch('http://localhost:8000/api/partners');
+                if (!response.ok) return;
+                const data = await response.json();
+                renderPartners(data);
+            } catch (e) {
+                // Если API не запущен, оставляем отображение статических карточек
+                console.log('Работа в автономном режиме');
+            }
+        }
+
+        function renderPartners(partners) {
+            const listContainer = document.getElementById('partnersList');
+            listContainer.innerHTML = '';
+            partners.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'partner-card';
+
+                let name = p.company_name;
+                let type = 'Партнер';
+                if (name.includes('ООО')) { type = 'ООО'; name = name.replace('ООО', '').replace(/"/g, '').trim(); }
+                else if (name.includes('ИП')) { type = 'ИП'; name = name.replace('ИП', '').trim(); }
+                else if (name.includes('ТК')) { type = 'ТК'; name = name.replace('ТК', '').replace(/"/g, '').trim(); }
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <span class="partner-name">${type} | ${name}</span>
+                        <span class="partner-discount">${p.discount_percent}%</span>
+                    </div>
+                    <div class="card-body">
+                        <p class="director">Директор</p>
+                        <p class="phone">${p.contact_phone || '+7 (999) 000-00-00'}</p>
+                        <p class="rating">Рейтинг: 10</p>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+    </script>
+</body>
+</html>
