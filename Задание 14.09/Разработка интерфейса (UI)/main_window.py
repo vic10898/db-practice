@@ -95,27 +95,46 @@ class PartnerApp(tk.Tk):
         )
         title_label.pack(side="left", pady=10)
 
-        # Кнопка обновления данных
-        refresh_btn = tk.Button(
+        # Кнопка обновления данных (стилизованная метка без артефактов macOS)
+        refresh_btn = tk.Label(
             header_frame,
             text="Обновить данные",
-            font=("Arial", 10),
+            font=("Arial", 10, "bold"),
             bg="#2A73C6",
             fg="#FFFFFF",
-            relief="flat",
-            padx=14,
-            pady=6,
-            cursor="hand2",
-            command=self.load_partners
+            padx=16,
+            pady=7,
+            cursor="hand2"
         )
+        refresh_btn.bind("<Button-1>", lambda e: self.load_partners())
+        refresh_btn.bind("<Enter>", lambda e: refresh_btn.configure(bg="#1E5BA3"))
+        refresh_btn.bind("<Leave>", lambda e: refresh_btn.configure(bg="#2A73C6"))
         refresh_btn.pack(side="right", pady=10)
 
     def _create_partners_list(self):
         """Создает прокручиваемую область со списком карточек партнеров."""
+        # Настройка стиля скроллбара без черных желобов
+        style = ttk.Style(self)
+        try:
+            style.theme_use("clam")
+        except Exception:
+            pass
+
+        style.configure(
+            "Vertical.TScrollbar",
+            gripcount=0,
+            background="#CBD5E1",
+            darkcolor="#CBD5E1",
+            lightcolor="#CBD5E1",
+            troughcolor="#F4F6F9",
+            bordercolor="#F4F6F9",
+            arrowcolor="#64748B"
+        )
+
         container = tk.Frame(self, bg="#F4F6F9")
         container.pack(side="top", fill="both", expand=True, padx=20, pady=15)
 
-        self.canvas = tk.Canvas(container, bg="#F4F6F9", highlightthickness=0)
+        self.canvas = tk.Canvas(container, bg="#F4F6F9", highlightthickness=0, bd=0)
         self.scrollbar = ttk.Scrollbar(container, orient="vertical", command=self.canvas.yview)
 
         self.scrollable_frame = tk.Frame(self.canvas, bg="#F4F6F9")
