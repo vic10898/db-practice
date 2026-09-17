@@ -18,6 +18,21 @@ from db_service import get_all_partners_with_discounts, get_connection
 from test_db_service import init_mock_db
 
 
+class AutoScrollbar(tk.Scrollbar):
+    """
+    Полоса прокрутки, которая автоматически скрывается, если весь контент
+    помещается на экране, и отображается только при необходимости скролла.
+    """
+
+    def set(self, lo, hi):
+        if float(lo) <= 0.0 and float(hi) >= 1.0:
+            self.pack_forget()
+        else:
+            if not self.winfo_ismapped():
+                self.pack(side="right", fill="y")
+        super().set(lo, hi)
+
+
 class PartnerCRMApp(tk.Tk):
     """
     Основное окно CRM-системы: Отображение партнеров с динамическим расчетом скидок.
@@ -112,29 +127,22 @@ class PartnerCRMApp(tk.Tk):
 
     def _create_partners_container(self):
         """Создает область прокрутки для карточек партнеров."""
-        # Настройка стиля скроллбара без черных полос и темных желобов
-        style = ttk.Style(self)
-        try:
-            style.theme_use("clam")
-        except Exception:
-            pass
-
-        style.configure(
-            "Vertical.TScrollbar",
-            gripcount=0,
-            background="#CBD5E1",
-            darkcolor="#CBD5E1",
-            lightcolor="#CBD5E1",
-            troughcolor="#F4F6F9",
-            bordercolor="#F4F6F9",
-            arrowcolor="#64748B"
-        )
-
         container = tk.Frame(self, bg="#F4F6F9")
         container.pack(side="top", fill="both", expand=True, padx=24, pady=16)
 
         self.canvas = tk.Canvas(container, bg="#F4F6F9", highlightthickness=0, bd=0)
-        self.scrollbar = ttk.Scrollbar(container, orient="vertical", command=self.canvas.yview)
+        self.scrollbar = AutoScrollbar(
+            container,
+            orient="vertical",
+            command=self.canvas.yview,
+            bg="#CBD5E1",
+            troughcolor="#F4F6F9",
+            activebackground="#94A3B8",
+            bd=0,
+            highlightthickness=0,
+            relief="flat",
+            width=10
+        )
 
         self.cards_frame = tk.Frame(self.canvas, bg="#F4F6F9")
         self.cards_frame.bind(
@@ -146,7 +154,6 @@ class PartnerCRMApp(tk.Tk):
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
 
         self.canvas.pack(side="left", fill="both", expand=True)
-        self.scrollbar.pack(side="right", fill="y")
 
         self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
         self.canvas.bind("<Configure>", self._on_canvas_configure)
