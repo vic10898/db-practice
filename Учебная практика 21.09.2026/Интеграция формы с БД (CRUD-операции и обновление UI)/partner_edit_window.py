@@ -37,27 +37,59 @@ class StyledButton(tk.Label):
 
 class PlaceholderEntry(tk.Entry):
     def __init__(self, master=None, placeholder="", color="#9CA3AF", default_fg="#111827", *args, **kwargs):
-        super().__init__(master, bg="#FFFFFF", fg=default_fg, insertbackground=default_fg, relief="solid", bd=1, *args, **kwargs)
+        super().__init__(
+            master,
+            bg="#FFFFFF",
+            fg=color,
+            insertbackground=default_fg,
+            relief="solid",
+            bd=1,
+            highlightthickness=0,
+            *args,
+            **kwargs
+        )
         self.placeholder = placeholder
         self.placeholder_color = color
         self.default_fg = default_fg
         self._has_placeholder = False
 
-        self.bind("<FocusIn>", self._clear_placeholder)
-        self.bind("<FocusOut>", self._add_placeholder)
-        self._add_placeholder()
+        self.bind("<Button-1>", self._on_click)
+        self.bind("<FocusIn>", self._on_focus_in)
+        self.bind("<FocusOut>", self._on_focus_out)
+        self.bind("<KeyPress>", self._on_key_press)
 
-    def _clear_placeholder(self, event=None):
+        self._show_placeholder()
+
+    def _show_placeholder(self):
+        self.delete(0, tk.END)
+        self.insert(0, self.placeholder)
+        self.configure(fg=self.placeholder_color)
+        self._has_placeholder = True
+
+    def _on_focus_in(self, event=None):
+        if self._has_placeholder:
+            self.after_idle(lambda: self.icursor(0))
+
+    def _on_click(self, event=None):
+        if self._has_placeholder:
+            self.after_idle(lambda: self.icursor(0))
+
+    def _on_key_press(self, event):
+        ignore_keys = (
+            "Tab", "BackSpace", "Delete", "Shift_L", "Shift_R",
+            "Control_L", "Control_R", "Alt_L", "Alt_R", "Meta_L",
+            "Meta_R", "Left", "Right", "Up", "Down", "Caps_Lock"
+        )
+        if event.keysym in ignore_keys:
+            return
         if self._has_placeholder:
             self.delete(0, tk.END)
             self.configure(fg=self.default_fg)
             self._has_placeholder = False
 
-    def _add_placeholder(self, event=None):
-        if not self.get():
-            self.insert(0, self.placeholder)
-            self.configure(fg=self.placeholder_color)
-            self._has_placeholder = True
+    def _on_focus_out(self, event=None):
+        if not self.get().strip():
+            self._show_placeholder()
 
     def get_real_value(self) -> str:
         if self._has_placeholder:
@@ -65,14 +97,13 @@ class PlaceholderEntry(tk.Entry):
         return self.get().strip()
 
     def set_value(self, text: str):
-        self._clear_placeholder()
-        self.delete(0, tk.END)
         if text:
+            self._has_placeholder = False
+            self.delete(0, tk.END)
             self.insert(0, text)
             self.configure(fg=self.default_fg)
-            self._has_placeholder = False
         else:
-            self._add_placeholder()
+            self._show_placeholder()
 
 
 class PartnerEditWindow(tk.Toplevel):
@@ -137,7 +168,10 @@ class PartnerEditWindow(tk.Toplevel):
         container.pack(fill="both", expand=True)
 
         self._lbl(container, "Наименование компании *:")
-        self.entry_name = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
+        self.entry_name = tk.Entry(
+            container, font=("Arial", 10), bg="#FFFFFF", fg="#111827",
+            insertbackground="#111827", relief="solid", bd=1, highlightthickness=0
+        )
         self.entry_name.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._lbl(container, "Тип партнера *:")
@@ -146,16 +180,25 @@ class PartnerEditWindow(tk.Toplevel):
         self.combo_type.pack(fill="x", pady=(0, 8), ipady=3)
 
         self._lbl(container, "Рейтинг (целое неотрицательное число):")
-        self.entry_rating = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
+        self.entry_rating = tk.Entry(
+            container, font=("Arial", 10), bg="#FFFFFF", fg="#111827",
+            insertbackground="#111827", relief="solid", bd=1, highlightthickness=0
+        )
         self.entry_rating.insert(0, "0")
         self.entry_rating.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._lbl(container, "Юридический / фактический адрес:")
-        self.entry_address = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
+        self.entry_address = tk.Entry(
+            container, font=("Arial", 10), bg="#FFFFFF", fg="#111827",
+            insertbackground="#111827", relief="solid", bd=1, highlightthickness=0
+        )
         self.entry_address.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._lbl(container, "ФИО директора:")
-        self.entry_director = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
+        self.entry_director = tk.Entry(
+            container, font=("Arial", 10), bg="#FFFFFF", fg="#111827",
+            insertbackground="#111827", relief="solid", bd=1, highlightthickness=0
+        )
         self.entry_director.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._lbl(container, "Контактный телефон:")

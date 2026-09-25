@@ -42,33 +42,65 @@ class StyledButton(tk.Label):
 
 class PlaceholderEntry(tk.Entry):
     """
-    Текстовое поле ввода с поддержкой серого плейсхолдера,
-    который исчезает при фокусе и восстанавливается при потере фокуса пустым.
+    Текстовое поле ввода с умным плейсхолдером:
+    подсказка остается видимой при получении фокуса и исчезает только
+    в момент фактического ввода первого символа пользователем.
     """
 
     def __init__(self, master=None, placeholder="", color="#9CA3AF", default_fg="#111827", *args, **kwargs):
-        super().__init__(master, bg="#FFFFFF", fg=default_fg, insertbackground=default_fg, relief="solid", bd=1, *args, **kwargs)
+        super().__init__(
+            master,
+            bg="#FFFFFF",
+            fg=color,
+            insertbackground=default_fg,
+            relief="solid",
+            bd=1,
+            highlightthickness=0,
+            *args,
+            **kwargs
+        )
         self.placeholder = placeholder
         self.placeholder_color = color
         self.default_fg = default_fg
         self._has_placeholder = False
 
-        self.bind("<FocusIn>", self._clear_placeholder)
-        self.bind("<FocusOut>", self._add_placeholder)
+        self.bind("<Button-1>", self._on_click)
+        self.bind("<FocusIn>", self._on_focus_in)
+        self.bind("<FocusOut>", self._on_focus_out)
+        self.bind("<KeyPress>", self._on_key_press)
 
-        self._add_placeholder()
+        self._show_placeholder()
 
-    def _clear_placeholder(self, event=None):
+    def _show_placeholder(self):
+        self.delete(0, tk.END)
+        self.insert(0, self.placeholder)
+        self.configure(fg=self.placeholder_color)
+        self._has_placeholder = True
+
+    def _on_focus_in(self, event=None):
+        if self._has_placeholder:
+            self.after_idle(lambda: self.icursor(0))
+
+    def _on_click(self, event=None):
+        if self._has_placeholder:
+            self.after_idle(lambda: self.icursor(0))
+
+    def _on_key_press(self, event):
+        ignore_keys = (
+            "Tab", "BackSpace", "Delete", "Shift_L", "Shift_R",
+            "Control_L", "Control_R", "Alt_L", "Alt_R", "Meta_L",
+            "Meta_R", "Left", "Right", "Up", "Down", "Caps_Lock"
+        )
+        if event.keysym in ignore_keys:
+            return
         if self._has_placeholder:
             self.delete(0, tk.END)
             self.configure(fg=self.default_fg)
             self._has_placeholder = False
 
-    def _add_placeholder(self, event=None):
-        if not self.get():
-            self.insert(0, self.placeholder)
-            self.configure(fg=self.placeholder_color)
-            self._has_placeholder = True
+    def _on_focus_out(self, event=None):
+        if not self.get().strip():
+            self._show_placeholder()
 
     def get_real_value(self) -> str:
         """Возвращает фактический текст пользователя без подстановочного плейсхолдера."""
@@ -77,14 +109,13 @@ class PlaceholderEntry(tk.Entry):
         return self.get().strip()
 
     def set_value(self, text: str):
-        self._clear_placeholder()
-        self.delete(0, tk.END)
         if text:
+            self._has_placeholder = False
+            self.delete(0, tk.END)
             self.insert(0, text)
             self.configure(fg=self.default_fg)
-            self._has_placeholder = False
         else:
-            self._add_placeholder()
+            self._show_placeholder()
 
 
 class PartnerEditWindow(tk.Toplevel):
@@ -152,7 +183,7 @@ class PartnerEditWindow(tk.Toplevel):
         container = tk.Frame(self, bg="#F4F6F9", padx=28, pady=18)
         container.pack(fill="both", expand=True)
 
-        # 1. Наименование партнера
+        # 1. Наименование партнера (фиксированная тонкая рамка 1px без скачков фокуса)
         self._create_field_label(container, "Наименование партнера *:")
         self.entry_name = tk.Entry(
             container,
@@ -161,13 +192,13 @@ class PartnerEditWindow(tk.Toplevel):
             fg="#111827",
             insertbackground="#111827",
             relief="solid",
-            bd=1
+            bd=1,
+            highlightthickness=0
         )
         self.entry_name.pack(fill="x", pady=(0, 10), ipady=4)
 
         # 2. Тип партнера (строго выпадающий список Combobox)
         self._create_field_label(container, "Тип партнера *:")
-        # Combobox в режиме readonly исключает ручной ввод некорректной организационно-правовой формы
         self.combo_type = ttk.Combobox(
             container,
             values=self.PARTNER_TYPES,
@@ -186,7 +217,8 @@ class PartnerEditWindow(tk.Toplevel):
             fg="#111827",
             insertbackground="#111827",
             relief="solid",
-            bd=1
+            bd=1,
+            highlightthickness=0
         )
         self.entry_rating.insert(0, "0")
         self.entry_rating.pack(fill="x", pady=(0, 10), ipady=4)
@@ -200,7 +232,8 @@ class PartnerEditWindow(tk.Toplevel):
             fg="#111827",
             insertbackground="#111827",
             relief="solid",
-            bd=1
+            bd=1,
+            highlightthickness=0
         )
         self.entry_address.pack(fill="x", pady=(0, 10), ipady=4)
 
@@ -213,11 +246,12 @@ class PartnerEditWindow(tk.Toplevel):
             fg="#111827",
             insertbackground="#111827",
             relief="solid",
-            bd=1
+            bd=1,
+            highlightthickness=0
         )
         self.entry_director.pack(fill="x", pady=(0, 10), ipady=4)
 
-        # 6. Телефон компании (с плейсхолдером и ToolTip)
+        # 6. Телефон компании (с умным плейсхолдером и ToolTip)
         self._create_field_label(container, "Контактный телефон компании:")
         self.entry_phone = PlaceholderEntry(
             container,
@@ -227,7 +261,7 @@ class PartnerEditWindow(tk.Toplevel):
         self.entry_phone.pack(fill="x", pady=(0, 10), ipady=4)
         ToolTip(self.entry_phone, "Введите номер в формате: +7 (XXX) XXX-XX-XX")
 
-        # 7. Email компании (с плейсхолдером и ToolTip)
+        # 7. Email компании (с умным плейсхолдером и ToolTip)
         self._create_field_label(container, "Электронная почта (Email) *:")
         self.entry_email = PlaceholderEntry(
             container,
