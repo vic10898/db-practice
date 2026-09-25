@@ -4,7 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-from partner_edit_window import PartnerEditWindow
+from partner_edit_window import PartnerEditWindow, StyledButton
 
 
 class MainWindow(tk.Tk):
@@ -23,9 +23,39 @@ class MainWindow(tk.Tk):
 
         self.edit_window = None
 
+        self._setup_styles()
         self._build_header()
         self._build_content()
         self._build_status_bar()
+
+    def _setup_styles(self):
+        """Настройка стилей интерфейса для корректного отображения в macOS и Windows."""
+        style = ttk.Style(self)
+        try:
+            style.theme_use("clam")
+        except Exception:
+            pass
+
+        style.configure(
+            "Treeview",
+            background="#FFFFFF",
+            foreground="#111827",
+            fieldbackground="#FFFFFF",
+            font=("Arial", 10),
+            rowheight=26
+        )
+        style.configure(
+            "Treeview.Heading",
+            background="#F1F5F9",
+            foreground="#1E293B",
+            font=("Arial", 10, "bold"),
+            relief="flat"
+        )
+        style.map(
+            "Treeview",
+            background=[("selected", "#2A73C6")],
+            foreground=[("selected", "#FFFFFF")]
+        )
 
     def _build_header(self):
         header_frame = tk.Frame(self, bg="#FFFFFF", height=70, padx=24, pady=12)
@@ -43,14 +73,14 @@ class MainWindow(tk.Tk):
         title_lbl.pack(side="left")
 
         # Кнопка перехода к форме добавления партнера
-        add_btn = tk.Button(
+        add_btn = StyledButton(
             header_frame,
             text="+ Добавить партнера",
-            font=("Arial", 10, "bold"),
             bg="#2A73C6",
             fg="#FFFFFF",
+            hover_bg="#1E5BA3",
             padx=16,
-            pady=6,
+            pady=7,
             command=self.open_add_partner_window
         )
         add_btn.pack(side="right")
@@ -65,12 +95,11 @@ class MainWindow(tk.Tk):
                  "или дважды кликните по записи в реестре для перехода к редактированию.",
             font=("Arial", 10),
             bg="#F4F6F9",
-            fg="#6B7280",
+            fg="#4B5563",
             justify="left"
         )
         list_caption.pack(anchor="w", pady=(0, 12))
 
-        # Демонстрационный список партнеров в виде таблицы
         columns = ("id", "type", "name", "director", "phone", "rating")
         self.tree = ttk.Treeview(container, columns=columns, show="headings", height=12)
 

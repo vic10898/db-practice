@@ -5,7 +5,7 @@ from tkinter import ttk, messagebox
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 from db_manager import DatabaseManager
-from partner_edit_window import PartnerEditWindow
+from partner_edit_window import PartnerEditWindow, StyledButton
 
 
 class MainWindow(tk.Tk):
@@ -25,12 +25,40 @@ class MainWindow(tk.Tk):
         self.minsize(800, 520)
         self.configure(bg="#F4F6F9")
 
+        self._setup_styles()
         self._build_header()
         self._build_table()
         self._build_status_bar()
 
-        # Первоначальная загрузка реестра из базы данных
         self.refresh_partners()
+
+    def _setup_styles(self):
+        style = ttk.Style(self)
+        try:
+            style.theme_use("clam")
+        except Exception:
+            pass
+
+        style.configure(
+            "Treeview",
+            background="#FFFFFF",
+            foreground="#111827",
+            fieldbackground="#FFFFFF",
+            font=("Arial", 10),
+            rowheight=26
+        )
+        style.configure(
+            "Treeview.Heading",
+            background="#F1F5F9",
+            foreground="#1E293B",
+            font=("Arial", 10, "bold"),
+            relief="flat"
+        )
+        style.map(
+            "Treeview",
+            background=[("selected", "#2A73C6")],
+            foreground=[("selected", "#FFFFFF")]
+        )
 
     def _build_header(self):
         header = tk.Frame(self, bg="#FFFFFF", height=70, padx=24, pady=12)
@@ -46,26 +74,27 @@ class MainWindow(tk.Tk):
         )
         title.pack(side="left")
 
-        add_btn = tk.Button(
+        add_btn = StyledButton(
             header,
             text="+ Добавить партнера",
-            font=("Arial", 10, "bold"),
             bg="#2A73C6",
             fg="#FFFFFF",
+            hover_bg="#1E5BA3",
             padx=16,
-            pady=6,
+            pady=7,
             command=self.open_add_dialog
         )
         add_btn.pack(side="right", padx=(10, 0))
 
-        reload_btn = tk.Button(
+        reload_btn = StyledButton(
             header,
             text="Обновить",
+            bg="#E2E8F0",
+            fg="#1E293B",
+            hover_bg="#CBD5E1",
             font=("Arial", 10),
-            bg="#E5E7EB",
-            fg="#1F2937",
-            padx=12,
-            pady=6,
+            padx=14,
+            pady=7,
             command=self.refresh_partners
         )
         reload_btn.pack(side="right")
@@ -103,7 +132,6 @@ class MainWindow(tk.Tk):
         self.tree.pack(side="left", fill="both", expand=True)
         scrollbar.pack(side="right", fill="y")
 
-        # Двойной клик на партнера открывает окно редактирования
         self.tree.bind("<Double-1>", self.on_double_click_row)
 
     def _build_status_bar(self):
@@ -121,7 +149,6 @@ class MainWindow(tk.Tk):
         self.status_lbl.pack(side="left")
 
     def refresh_partners(self):
-        """Загрузка актуального списка партнеров из БД и перерисовка таблицы."""
         for item in self.tree.get_children():
             self.tree.delete(item)
 
@@ -151,7 +178,6 @@ class MainWindow(tk.Tk):
             self.status_lbl.config(text=f"Ошибка загрузки данных: {err}", fg="#DC2626")
 
     def open_add_dialog(self):
-        """Открывает пустую карточку для создания партнера."""
         if self.edit_window and self.edit_window.winfo_exists():
             self.edit_window.lift()
             return
@@ -164,7 +190,6 @@ class MainWindow(tk.Tk):
         )
 
     def on_double_click_row(self, event):
-        """Открывает карточку выбранного партнера в режиме редактирования."""
         selected = self.tree.selection()
         if not selected:
             return

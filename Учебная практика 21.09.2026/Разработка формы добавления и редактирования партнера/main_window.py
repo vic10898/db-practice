@@ -1,10 +1,10 @@
 import os
 import sys
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-from partner_edit_window import PartnerEditWindow
+from partner_edit_window import PartnerEditWindow, StyledButton
 
 
 class MainWindow(tk.Tk):
@@ -55,10 +55,39 @@ class MainWindow(tk.Tk):
             }
         ]
 
+        self._setup_styles()
         self._build_header()
         self._build_table()
         self._build_status_bar()
         self._refresh_table()
+
+    def _setup_styles(self):
+        style = ttk.Style(self)
+        try:
+            style.theme_use("clam")
+        except Exception:
+            pass
+
+        style.configure(
+            "Treeview",
+            background="#FFFFFF",
+            foreground="#111827",
+            fieldbackground="#FFFFFF",
+            font=("Arial", 10),
+            rowheight=26
+        )
+        style.configure(
+            "Treeview.Heading",
+            background="#F1F5F9",
+            foreground="#1E293B",
+            font=("Arial", 10, "bold"),
+            relief="flat"
+        )
+        style.map(
+            "Treeview",
+            background=[("selected", "#2A73C6")],
+            foreground=[("selected", "#FFFFFF")]
+        )
 
     def _build_header(self):
         header = tk.Frame(self, bg="#FFFFFF", height=68, padx=24, pady=12)
@@ -75,14 +104,14 @@ class MainWindow(tk.Tk):
         )
         title.pack(side="left")
 
-        add_btn = tk.Button(
+        add_btn = StyledButton(
             header,
             text="+ Добавить партнера",
-            font=("Arial", 10, "bold"),
             bg="#2A73C6",
             fg="#FFFFFF",
+            hover_bg="#1E5BA3",
             padx=16,
-            pady=6,
+            pady=7,
             command=self.open_add_window
         )
         add_btn.pack(side="right")

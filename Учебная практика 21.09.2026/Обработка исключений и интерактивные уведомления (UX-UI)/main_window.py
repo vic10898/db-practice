@@ -6,7 +6,7 @@ from tkinter import ttk
 current_dir = os.path.dirname(os.path.abspath(__file__))
 from db_manager import DatabaseManager, DatabaseConnectionError
 from dialogs import AppDialogs
-from partner_edit_window import PartnerEditWindow
+from partner_edit_window import PartnerEditWindow, StyledButton
 
 
 class MainWindow(tk.Tk):
@@ -27,11 +27,40 @@ class MainWindow(tk.Tk):
         self.minsize(820, 540)
         self.configure(bg="#F4F6F9")
 
+        self._setup_styles()
         self._build_header()
         self._build_table()
         self._build_status_bar()
 
         self.refresh_partners()
+
+    def _setup_styles(self):
+        style = ttk.Style(self)
+        try:
+            style.theme_use("clam")
+        except Exception:
+            pass
+
+        style.configure(
+            "Treeview",
+            background="#FFFFFF",
+            foreground="#111827",
+            fieldbackground="#FFFFFF",
+            font=("Arial", 10),
+            rowheight=26
+        )
+        style.configure(
+            "Treeview.Heading",
+            background="#F1F5F9",
+            foreground="#1E293B",
+            font=("Arial", 10, "bold"),
+            relief="flat"
+        )
+        style.map(
+            "Treeview",
+            background=[("selected", "#2A73C6")],
+            foreground=[("selected", "#FFFFFF")]
+        )
 
     def _build_header(self):
         header = tk.Frame(self, bg="#FFFFFF", height=72, padx=24, pady=12)
@@ -62,26 +91,27 @@ class MainWindow(tk.Tk):
         btn_box = tk.Frame(header, bg="#FFFFFF")
         btn_box.pack(side="right")
 
-        refresh_btn = tk.Button(
+        refresh_btn = StyledButton(
             btn_box,
             text="Обновить",
+            bg="#E2E8F0",
+            fg="#1E293B",
+            hover_bg="#CBD5E1",
             font=("Arial", 10),
-            bg="#E5E7EB",
-            fg="#1F2937",
             padx=14,
-            pady=6,
+            pady=7,
             command=self.refresh_partners
         )
         refresh_btn.pack(side="left", padx=(0, 10))
 
-        add_btn = tk.Button(
+        add_btn = StyledButton(
             btn_box,
             text="+ Добавить партнера",
-            font=("Arial", 10, "bold"),
             bg="#2A73C6",
             fg="#FFFFFF",
+            hover_bg="#1E5BA3",
             padx=18,
-            pady=6,
+            pady=7,
             command=self.open_add_window
         )
         add_btn.pack(side="left")

@@ -14,9 +14,37 @@ from db_manager import (
 )
 
 
+class StyledButton(tk.Label):
+    def __init__(self, master, text, command=None, bg="#2A73C6", fg="#FFFFFF", hover_bg="#1E5BA3", padx=16, pady=7, font=("Arial", 10, "bold"), **kwargs):
+        super().__init__(
+            master,
+            text=text,
+            bg=bg,
+            fg=fg,
+            padx=padx,
+            pady=pady,
+            font=font,
+            cursor="hand2",
+            relief="solid",
+            bd=0,
+            **kwargs
+        )
+        self.command = command
+        self.default_bg = bg
+        self.hover_bg = hover_bg
+
+        self.bind("<Button-1>", self._on_click)
+        self.bind("<Enter>", lambda e: self.configure(bg=self.hover_bg))
+        self.bind("<Leave>", lambda e: self.configure(bg=self.default_bg))
+
+    def _on_click(self, event=None):
+        if self.command:
+            self.command()
+
+
 class PlaceholderEntry(tk.Entry):
     def __init__(self, master=None, placeholder="", color="#9CA3AF", default_fg="#111827", *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
+        super().__init__(master, bg="#FFFFFF", fg=default_fg, insertbackground=default_fg, relief="solid", bd=1, *args, **kwargs)
         self.placeholder = placeholder
         self.placeholder_color = color
         self.default_fg = default_fg
@@ -69,7 +97,6 @@ class PartnerEditWindow(tk.Toplevel):
         self.partner_id = partner_id
         self.on_saved_callback = on_saved_callback
 
-        # Заголовки окон строго отражают назначение
         if self.partner_id is None:
             self.title("CRM: Карточка партнера [Создание]")
         else:
@@ -79,18 +106,15 @@ class PartnerEditWindow(tk.Toplevel):
         self.minsize(500, 560)
         self.configure(bg="#F4F6F9")
 
-        # Перехват кнопки закрытия окна для проверки несохраненных изменений
         self.protocol("WM_DELETE_WINDOW", self.on_back_clicked)
 
         self._build_header()
         self._build_form()
         self._build_buttons()
 
-        # Загрузка данных при редактировании
         if self.partner_id is not None:
             self._load_partner_data()
 
-        # Фиксируем исходное состояние формы для отслеживания изменений (is_dirty)
         self._initial_state = self.get_raw_form_data()
 
         self.transient(master)
@@ -122,7 +146,7 @@ class PartnerEditWindow(tk.Toplevel):
         container.pack(fill="both", expand=True)
 
         self._label(container, "Наименование организации *:")
-        self.entry_name = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_name = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
         self.entry_name.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._label(container, "Организационно-правовая форма (Тип) *:")
@@ -131,24 +155,24 @@ class PartnerEditWindow(tk.Toplevel):
         self.combo_type.pack(fill="x", pady=(0, 8), ipady=3)
 
         self._label(container, "Рейтинг (целое неотрицательное число от 0) *:")
-        self.entry_rating = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_rating = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
         self.entry_rating.insert(0, "0")
         self.entry_rating.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._label(container, "Адрес компании:")
-        self.entry_address = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_address = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
         self.entry_address.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._label(container, "ФИО руководителя компании:")
-        self.entry_director = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_director = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
         self.entry_director.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._label(container, "Контактный телефон:")
-        self.entry_phone = PlaceholderEntry(container, placeholder="+7 (999) 000-00-00", font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_phone = PlaceholderEntry(container, placeholder="+7 (999) 000-00-00", font=("Arial", 10))
         self.entry_phone.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._label(container, "Email для связи *:")
-        self.entry_email = PlaceholderEntry(container, placeholder="info@company.ru", font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_email = PlaceholderEntry(container, placeholder="info@company.ru", font=("Arial", 10))
         self.entry_email.pack(fill="x", pady=(0, 8), ipady=4)
 
     def _label(self, parent, text):
@@ -160,24 +184,26 @@ class PartnerEditWindow(tk.Toplevel):
         bottom_frame = tk.Frame(self, bg="#FFFFFF", padx=24, pady=12)
         bottom_frame.pack(side="bottom", fill="x")
 
-        cancel_btn = tk.Button(
+        cancel_btn = StyledButton(
             bottom_frame,
             text="Назад",
+            bg="#E2E8F0",
+            fg="#1E293B",
+            hover_bg="#CBD5E1",
             font=("Arial", 10),
-            bg="#E5E7EB",
-            fg="#1F2937",
             padx=18,
             pady=6,
             command=self.on_back_clicked
         )
         cancel_btn.pack(side="left")
 
-        save_btn = tk.Button(
+        save_btn = StyledButton(
             bottom_frame,
             text="Сохранить",
-            font=("Arial", 10, "bold"),
             bg="#2A73C6",
             fg="#FFFFFF",
+            hover_bg="#1E5BA3",
+            font=("Arial", 10, "bold"),
             padx=22,
             pady=6,
             command=self.save_data
@@ -209,7 +235,6 @@ class PartnerEditWindow(tk.Toplevel):
             self.on_force_close()
 
     def get_raw_form_data(self) -> dict:
-        """Считывает сырые данные формы для проверки изменений."""
         return {
             "company_name": self.entry_name.get().strip(),
             "partner_type": self.combo_type.get(),
@@ -221,27 +246,20 @@ class PartnerEditWindow(tk.Toplevel):
         }
 
     def is_dirty(self) -> bool:
-        """Проверяет, изменил ли пользователь какие-либо данные с момента открытия."""
         current_state = self.get_raw_form_data()
         return current_state != self._initial_state
 
     def save_data(self):
-        """
-        Выполняет валидацию и сохранение в БД с выводом системных MessageBox.
-        """
         raw_data = self.get_raw_form_data()
 
-        # Валидация входных данных через конструкцию try...except
         try:
             validated_data = validate_partner_form_data(raw_data)
         except ValidationError as err:
-            # 1. Диалоговое окно: Ошибка (Error) с понятным текстом и порядком действий
             AppDialogs.show_error(
                 parent=self,
                 title="Ошибка валидации данных",
                 message=err.message
             )
-            # Перевод фокуса на проблемное поле
             if err.field_name == "company_name":
                 self.entry_name.focus_set()
             elif err.field_name == "email":
@@ -250,11 +268,9 @@ class PartnerEditWindow(tk.Toplevel):
                 self.entry_rating.focus_set()
             return
 
-        # Сохранение в базу данных с перехватом исключений СУБД
         try:
             if self.partner_id is None:
                 new_id = self.db.add_partner(validated_data)
-                # 3. Диалоговое окно: Информация (Information) об успешном добавлении
                 AppDialogs.show_info_success(
                     parent=self,
                     title="Успешное добавление",
@@ -262,21 +278,18 @@ class PartnerEditWindow(tk.Toplevel):
                 )
             else:
                 self.db.update_partner(self.partner_id, validated_data)
-                # 3. Диалоговое окно: Информация (Information) об успешном обновлении
                 AppDialogs.show_info_success(
                     parent=self,
                     title="Успешное сохранение",
                     message=f"Данные партнера #{self.partner_id} успешно обновлены в базе данных."
                 )
 
-            # Оповещение главного окна об изменении данных
             if self.on_saved_callback:
                 self.on_saved_callback()
 
             self.on_force_close()
 
         except (DatabaseIntegrityError, DatabaseConnectionError) as err:
-            # 1. Диалоговое окно: Ошибка (Error) при сбое СУБД
             AppDialogs.show_error(
                 parent=self,
                 title="Ошибка базы данных",
@@ -290,12 +303,7 @@ class PartnerEditWindow(tk.Toplevel):
             )
 
     def on_back_clicked(self):
-        """
-        При нажатии «Назад» / «Отмена» или крестика:
-        если пользователь изменил поля, предупреждаем о потере данных.
-        """
         if self.is_dirty():
-            # 2. Диалоговое окно: Предупреждение (Warning)
             confirmed = AppDialogs.ask_warning_discard(parent=self)
             if not confirmed:
                 return

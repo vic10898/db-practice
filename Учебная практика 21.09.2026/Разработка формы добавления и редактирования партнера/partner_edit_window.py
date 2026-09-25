@@ -7,6 +7,39 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 from tooltips import ToolTip
 
 
+class StyledButton(tk.Label):
+    """
+    Кроссплатформенная стилизованная кнопка без артефактов отрисовки macOS.
+    Гарантирует четкую видимость текста и фона в любой теме оформления.
+    """
+
+    def __init__(self, master, text, command=None, bg="#2A73C6", fg="#FFFFFF", hover_bg="#1E5BA3", padx=16, pady=7, font=("Arial", 10, "bold"), **kwargs):
+        super().__init__(
+            master,
+            text=text,
+            bg=bg,
+            fg=fg,
+            padx=padx,
+            pady=pady,
+            font=font,
+            cursor="hand2",
+            relief="solid",
+            bd=0,
+            **kwargs
+        )
+        self.command = command
+        self.default_bg = bg
+        self.hover_bg = hover_bg
+
+        self.bind("<Button-1>", self._on_click)
+        self.bind("<Enter>", lambda e: self.configure(bg=self.hover_bg))
+        self.bind("<Leave>", lambda e: self.configure(bg=self.default_bg))
+
+    def _on_click(self, event=None):
+        if self.command:
+            self.command()
+
+
 class PlaceholderEntry(tk.Entry):
     """
     Текстовое поле ввода с поддержкой серого плейсхолдера,
@@ -14,7 +47,7 @@ class PlaceholderEntry(tk.Entry):
     """
 
     def __init__(self, master=None, placeholder="", color="#9CA3AF", default_fg="#111827", *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
+        super().__init__(master, bg="#FFFFFF", fg=default_fg, insertbackground=default_fg, relief="solid", bd=1, *args, **kwargs)
         self.placeholder = placeholder
         self.placeholder_color = color
         self.default_fg = default_fg
@@ -121,7 +154,15 @@ class PartnerEditWindow(tk.Toplevel):
 
         # 1. Наименование партнера
         self._create_field_label(container, "Наименование партнера *:")
-        self.entry_name = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_name = tk.Entry(
+            container,
+            font=("Arial", 10),
+            bg="#FFFFFF",
+            fg="#111827",
+            insertbackground="#111827",
+            relief="solid",
+            bd=1
+        )
         self.entry_name.pack(fill="x", pady=(0, 10), ipady=4)
 
         # 2. Тип партнера (строго выпадающий список Combobox)
@@ -138,18 +179,42 @@ class PartnerEditWindow(tk.Toplevel):
 
         # 3. Рейтинг (целое неотрицательное число)
         self._create_field_label(container, "Рейтинг (целое число от 0):")
-        self.entry_rating = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_rating = tk.Entry(
+            container,
+            font=("Arial", 10),
+            bg="#FFFFFF",
+            fg="#111827",
+            insertbackground="#111827",
+            relief="solid",
+            bd=1
+        )
         self.entry_rating.insert(0, "0")
         self.entry_rating.pack(fill="x", pady=(0, 10), ipady=4)
 
         # 4. Адрес компании
         self._create_field_label(container, "Юридический / фактический адрес:")
-        self.entry_address = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_address = tk.Entry(
+            container,
+            font=("Arial", 10),
+            bg="#FFFFFF",
+            fg="#111827",
+            insertbackground="#111827",
+            relief="solid",
+            bd=1
+        )
         self.entry_address.pack(fill="x", pady=(0, 10), ipady=4)
 
         # 5. ФИО директора
         self._create_field_label(container, "ФИО директора компании:")
-        self.entry_director = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_director = tk.Entry(
+            container,
+            font=("Arial", 10),
+            bg="#FFFFFF",
+            fg="#111827",
+            insertbackground="#111827",
+            relief="solid",
+            bd=1
+        )
         self.entry_director.pack(fill="x", pady=(0, 10), ipady=4)
 
         # 6. Телефон компании (с плейсхолдером и ToolTip)
@@ -157,10 +222,7 @@ class PartnerEditWindow(tk.Toplevel):
         self.entry_phone = PlaceholderEntry(
             container,
             placeholder="+7 (999) 000-00-00",
-            font=("Arial", 10),
-            bg="#FFFFFF",
-            relief="solid",
-            bd=1
+            font=("Arial", 10)
         )
         self.entry_phone.pack(fill="x", pady=(0, 10), ipady=4)
         ToolTip(self.entry_phone, "Введите номер в формате: +7 (XXX) XXX-XX-XX")
@@ -170,10 +232,7 @@ class PartnerEditWindow(tk.Toplevel):
         self.entry_email = PlaceholderEntry(
             container,
             placeholder="info@company.ru",
-            font=("Arial", 10),
-            bg="#FFFFFF",
-            relief="solid",
-            bd=1
+            font=("Arial", 10)
         )
         self.entry_email.pack(fill="x", pady=(0, 10), ipady=4)
         ToolTip(self.entry_email, "Обязательное поле. Формат: partner@domain.ru")
@@ -196,12 +255,13 @@ class PartnerEditWindow(tk.Toplevel):
         bottom_frame.pack(side="bottom", fill="x")
 
         # Кнопка «Назад» / «Отмена»
-        cancel_btn = tk.Button(
+        cancel_btn = StyledButton(
             bottom_frame,
             text="Назад",
+            bg="#E2E8F0",
+            fg="#1E293B",
+            hover_bg="#CBD5E1",
             font=("Arial", 10),
-            bg="#E5E7EB",
-            fg="#1F2937",
             padx=18,
             pady=6,
             command=self.on_back_clicked
@@ -209,12 +269,13 @@ class PartnerEditWindow(tk.Toplevel):
         cancel_btn.pack(side="left")
 
         # Кнопка сохранения данных
-        save_btn = tk.Button(
+        save_btn = StyledButton(
             bottom_frame,
             text="Сохранить",
-            font=("Arial", 10, "bold"),
             bg="#2A73C6",
             fg="#FFFFFF",
+            hover_bg="#1E5BA3",
+            font=("Arial", 10, "bold"),
             padx=20,
             pady=6,
             command=self.on_save_clicked
@@ -227,7 +288,6 @@ class PartnerEditWindow(tk.Toplevel):
             self.entry_name.delete(0, tk.END)
             self.entry_name.insert(0, data.get("company_name") or "")
 
-        # Сопоставление типа партнера со списком допустимых значений
         partner_type = data.get("partner_type") or "ООО"
         if partner_type in self.PARTNER_TYPES:
             self.combo_type.set(partner_type)
@@ -264,7 +324,6 @@ class PartnerEditWindow(tk.Toplevel):
         }
 
     def on_save_clicked(self):
-        """Передает собранные данные в вызывающий обработчик."""
         data = self.get_form_data()
         if self.on_save_callback:
             self.on_save_callback(data)

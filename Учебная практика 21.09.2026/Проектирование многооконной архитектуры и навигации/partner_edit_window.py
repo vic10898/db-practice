@@ -2,6 +2,39 @@ import tkinter as tk
 from tkinter import ttk
 
 
+class StyledButton(tk.Label):
+    """
+    Кроссплатформенная стилизованная кнопка без артефактов отрисовки macOS.
+    Гарантирует четкую видимость текста и фона в любой теме оформления.
+    """
+
+    def __init__(self, master, text, command=None, bg="#2A73C6", fg="#FFFFFF", hover_bg="#1E5BA3", padx=16, pady=7, font=("Arial", 10, "bold"), **kwargs):
+        super().__init__(
+            master,
+            text=text,
+            bg=bg,
+            fg=fg,
+            padx=padx,
+            pady=pady,
+            font=font,
+            cursor="hand2",
+            relief="solid",
+            bd=0,
+            **kwargs
+        )
+        self.command = command
+        self.default_bg = bg
+        self.hover_bg = hover_bg
+
+        self.bind("<Button-1>", self._on_click)
+        self.bind("<Enter>", lambda e: self.configure(bg=self.hover_bg))
+        self.bind("<Leave>", lambda e: self.configure(bg=self.default_bg))
+
+    def _on_click(self, event=None):
+        if self.command:
+            self.command()
+
+
 class PartnerEditWindow(tk.Toplevel):
     """
     Окно создания и редактирования партнера.
@@ -21,8 +54,8 @@ class PartnerEditWindow(tk.Toplevel):
         else:
             self.title("CRM: Карточка партнера [Редактирование]")
 
-        self.geometry("520x460")
-        self.minsize(460, 380)
+        self.geometry("540x480")
+        self.minsize(480, 400)
         self.configure(bg="#F4F6F9")
 
         # Перехват системного закрытия окна (крестик)
@@ -65,7 +98,7 @@ class PartnerEditWindow(tk.Toplevel):
                  "Для возврата в реестр нажмите кнопку «Назад».",
             font=("Arial", 11),
             bg="#F4F6F9",
-            fg="#4B5563",
+            fg="#374151",
             justify="left"
         )
         info_lbl.pack(anchor="w", pady=(0, 20))
@@ -75,13 +108,14 @@ class PartnerEditWindow(tk.Toplevel):
         bottom_frame = tk.Frame(self, bg="#FFFFFF", padx=20, pady=12)
         bottom_frame.pack(side="bottom", fill="x")
 
-        back_btn = tk.Button(
+        back_btn = StyledButton(
             bottom_frame,
             text="Назад",
-            font=("Arial", 10, "bold"),
-            bg="#E5E7EB",
-            fg="#1F2937",
-            padx=16,
+            bg="#E2E8F0",
+            fg="#1E293B",
+            hover_bg="#CBD5E1",
+            font=("Arial", 10),
+            padx=18,
             pady=6,
             command=self.on_back_clicked
         )

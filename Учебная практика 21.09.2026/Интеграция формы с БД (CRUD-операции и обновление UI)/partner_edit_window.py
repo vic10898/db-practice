@@ -7,9 +7,37 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 from db_manager import DatabaseManager, IntegrityViolationError, PartnerNotFoundError
 
 
+class StyledButton(tk.Label):
+    def __init__(self, master, text, command=None, bg="#2A73C6", fg="#FFFFFF", hover_bg="#1E5BA3", padx=16, pady=7, font=("Arial", 10, "bold"), **kwargs):
+        super().__init__(
+            master,
+            text=text,
+            bg=bg,
+            fg=fg,
+            padx=padx,
+            pady=pady,
+            font=font,
+            cursor="hand2",
+            relief="solid",
+            bd=0,
+            **kwargs
+        )
+        self.command = command
+        self.default_bg = bg
+        self.hover_bg = hover_bg
+
+        self.bind("<Button-1>", self._on_click)
+        self.bind("<Enter>", lambda e: self.configure(bg=self.hover_bg))
+        self.bind("<Leave>", lambda e: self.configure(bg=self.default_bg))
+
+    def _on_click(self, event=None):
+        if self.command:
+            self.command()
+
+
 class PlaceholderEntry(tk.Entry):
     def __init__(self, master=None, placeholder="", color="#9CA3AF", default_fg="#111827", *args, **kwargs):
-        super().__init__(master, *args, **kwargs)
+        super().__init__(master, bg="#FFFFFF", fg=default_fg, insertbackground=default_fg, relief="solid", bd=1, *args, **kwargs)
         self.placeholder = placeholder
         self.placeholder_color = color
         self.default_fg = default_fg
@@ -62,7 +90,6 @@ class PartnerEditWindow(tk.Toplevel):
         self.partner_id = partner_id
         self.on_saved_callback = on_saved_callback
 
-        # Заголовки строго по ТЗ
         if self.partner_id is None:
             self.title("CRM: Карточка партнера [Создание]")
         else:
@@ -78,7 +105,6 @@ class PartnerEditWindow(tk.Toplevel):
         self._build_fields()
         self._build_buttons()
 
-        # Режим редактирования: автоматическая подгрузка данных из БД
         if self.partner_id is not None:
             self._load_partner_from_db()
 
@@ -111,7 +137,7 @@ class PartnerEditWindow(tk.Toplevel):
         container.pack(fill="both", expand=True)
 
         self._lbl(container, "Наименование компании *:")
-        self.entry_name = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_name = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
         self.entry_name.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._lbl(container, "Тип партнера *:")
@@ -120,24 +146,24 @@ class PartnerEditWindow(tk.Toplevel):
         self.combo_type.pack(fill="x", pady=(0, 8), ipady=3)
 
         self._lbl(container, "Рейтинг (целое неотрицательное число):")
-        self.entry_rating = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_rating = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
         self.entry_rating.insert(0, "0")
         self.entry_rating.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._lbl(container, "Юридический / фактический адрес:")
-        self.entry_address = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_address = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
         self.entry_address.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._lbl(container, "ФИО директора:")
-        self.entry_director = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_director = tk.Entry(container, font=("Arial", 10), bg="#FFFFFF", fg="#111827", insertbackground="#111827", relief="solid", bd=1)
         self.entry_director.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._lbl(container, "Контактный телефон:")
-        self.entry_phone = PlaceholderEntry(container, placeholder="+7 (999) 000-00-00", font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_phone = PlaceholderEntry(container, placeholder="+7 (999) 000-00-00", font=("Arial", 10))
         self.entry_phone.pack(fill="x", pady=(0, 8), ipady=4)
 
         self._lbl(container, "Email организации *:")
-        self.entry_email = PlaceholderEntry(container, placeholder="info@company.ru", font=("Arial", 10), bg="#FFFFFF", relief="solid", bd=1)
+        self.entry_email = PlaceholderEntry(container, placeholder="info@company.ru", font=("Arial", 10))
         self.entry_email.pack(fill="x", pady=(0, 8), ipady=4)
 
     def _lbl(self, parent, text):
@@ -149,24 +175,26 @@ class PartnerEditWindow(tk.Toplevel):
         bottom_frame = tk.Frame(self, bg="#FFFFFF", padx=24, pady=12)
         bottom_frame.pack(side="bottom", fill="x")
 
-        cancel_btn = tk.Button(
+        cancel_btn = StyledButton(
             bottom_frame,
             text="Назад",
+            bg="#E2E8F0",
+            fg="#1E293B",
+            hover_bg="#CBD5E1",
             font=("Arial", 10),
-            bg="#E5E7EB",
-            fg="#1F2937",
             padx=18,
             pady=6,
             command=self.on_back_clicked
         )
         cancel_btn.pack(side="left")
 
-        save_btn = tk.Button(
+        save_btn = StyledButton(
             bottom_frame,
             text="Сохранить в БД",
-            font=("Arial", 10, "bold"),
             bg="#2A73C6",
             fg="#FFFFFF",
+            hover_bg="#1E5BA3",
+            font=("Arial", 10, "bold"),
             padx=20,
             pady=6,
             command=self.save_partner
@@ -174,7 +202,6 @@ class PartnerEditWindow(tk.Toplevel):
         save_btn.pack(side="right")
 
     def _load_partner_from_db(self):
-        """Загрузка данных из БД в режиме редактирования."""
         try:
             partner = self.db.get_partner_by_id(self.partner_id)
             self.entry_name.delete(0, tk.END)
@@ -199,7 +226,6 @@ class PartnerEditWindow(tk.Toplevel):
             self.on_back_clicked()
 
     def save_partner(self):
-        """Выполняет INSERT или UPDATE в БД и обновляет UI."""
         data = {
             "company_name": self.entry_name.get().strip(),
             "partner_type": self.combo_type.get(),
@@ -212,11 +238,9 @@ class PartnerEditWindow(tk.Toplevel):
 
         try:
             if self.partner_id is None:
-                # Режим создания: INSERT
                 new_id = self.db.add_partner(data)
                 messagebox.showinfo("Успех", f"Партнер успешно добавлен (ID: {new_id})")
             else:
-                # Режим редактирования: UPDATE
                 self.db.update_partner(self.partner_id, data)
                 messagebox.showinfo("Успех", f"Данные партнера #{self.partner_id} успешно обновлены.")
 
