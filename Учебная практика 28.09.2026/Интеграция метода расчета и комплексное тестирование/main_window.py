@@ -106,18 +106,14 @@ class MainWindow(tk.Tk):
         )
         add_btn.pack(side="right")
 
-        # Логотип компании слева
+        # Логотип компании в оригинальном разрешении 1:1 без размытия
         if os.path.exists(self.logo_path):
             try:
                 pil_logo = Image.open(self.logo_path)
-                orig_w, orig_h = pil_logo.size
-                target_h = 44
-                target_w = int(orig_w * (target_h / orig_h))
-                pil_logo = pil_logo.resize((target_w, target_h), Image.Resampling.LANCZOS)
                 logo_img = ImageTk.PhotoImage(pil_logo)
                 logo_lbl = tk.Label(header, image=logo_img, bg="#FFFFFF")
                 logo_lbl.image = logo_img
-                logo_lbl.pack(side="left", padx=(0, 18))
+                logo_lbl.pack(side="left", padx=(0, 20))
             except Exception:
                 pass
 

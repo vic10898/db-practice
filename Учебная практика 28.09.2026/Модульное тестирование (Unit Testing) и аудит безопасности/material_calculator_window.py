@@ -62,14 +62,10 @@ class MaterialCalculatorWindow(tk.Toplevel):
 
         tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
 
+        # Фирменный логотип в оригинальном четком разрешении без сжатия
         if os.path.exists(self.logo_path):
             try:
                 pil_logo = Image.open(self.logo_path)
-                # Масштабирование с сохранением исходных пропорций сторон (aspect ratio)
-                orig_w, orig_h = pil_logo.size
-                target_h = 44
-                target_w = int(orig_w * (target_h / orig_h))
-                pil_logo = pil_logo.resize((target_w, target_h), Image.Resampling.LANCZOS)
                 logo_img = ImageTk.PhotoImage(pil_logo)
                 logo_label = tk.Label(header_frame, image=logo_img, bg="#FFFFFF")
                 logo_label.image = logo_img

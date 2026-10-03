@@ -101,18 +101,14 @@ class PartnerHistoryWindow(tk.Toplevel):
         # Разделительная полоса
         tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
 
-        # Логотип компании с сохранением пропорций
+        # Логотип компании в оригинальном разрешении 1:1 без размытия
         if os.path.exists(self.logo_path):
             try:
                 pil_logo = Image.open(self.logo_path)
-                orig_w, orig_h = pil_logo.size
-                target_h = 44
-                target_w = int(orig_w * (target_h / orig_h))
-                pil_logo = pil_logo.resize((target_w, target_h), Image.Resampling.LANCZOS)
                 logo_img = ImageTk.PhotoImage(pil_logo)
                 logo_label = tk.Label(header_frame, image=logo_img, bg="#FFFFFF")
                 logo_label.image = logo_img
-                logo_label.pack(side="left", padx=(0, 18))
+                logo_label.pack(side="left", padx=(0, 20))
             except Exception:
                 pass
 
