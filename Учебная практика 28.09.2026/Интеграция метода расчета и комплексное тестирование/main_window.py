@@ -89,7 +89,24 @@ class MainWindow(tk.Tk):
         header.pack(side="top", fill="x")
         tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
 
-        # Логотип компании с сохранением пропорций сторон
+        # Кнопка добавления партнера справа в шапке (упаковывается первой для резервации места)
+        right_header_box = tk.Frame(header, bg="#FFFFFF")
+        right_header_box.pack(side="right", padx=(16, 0))
+
+        add_btn = StyledButton(
+            right_header_box,
+            text="+ Добавить партнера",
+            bg="#2A73C6",
+            fg="#FFFFFF",
+            hover_bg="#1E5BA3",
+            font=("Arial", 11, "bold"),
+            padx=18,
+            pady=8,
+            command=self.open_add_window
+        )
+        add_btn.pack(side="right")
+
+        # Логотип компании слева
         if os.path.exists(self.logo_path):
             try:
                 pil_logo = Image.open(self.logo_path)
@@ -104,8 +121,9 @@ class MainWindow(tk.Tk):
             except Exception:
                 pass
 
+        # Заголовок реестра
         title_box = tk.Frame(header, bg="#FFFFFF")
-        title_box.pack(side="left")
+        title_box.pack(side="left", fill="x", expand=True)
 
         title_lbl = tk.Label(
             title_box,
@@ -125,64 +143,66 @@ class MainWindow(tk.Tk):
         )
         subtitle_lbl.pack(anchor="w")
 
-        btn_box = tk.Frame(header, bg="#FFFFFF")
-        btn_box.pack(side="right")
+        # Панель инструментов (Toolbar) над таблицей
+        self._build_toolbar()
 
-        # 1. Кнопка вызова калькулятора материалов
-        calc_btn = StyledButton(
-            btn_box,
-            text="Калькулятор материалов",
-            bg="#059669",
-            fg="#FFFFFF",
-            hover_bg="#047857",
-            font=("Arial", 11, "bold"),
-            padx=16,
-            pady=8,
-            command=self.open_calculator_window
-        )
-        calc_btn.pack(side="left", padx=(0, 10))
+    def _build_toolbar(self):
+        """Панель быстрых действий над таблицей партнеров."""
+        toolbar = tk.Frame(self, bg="#FFFFFF", padx=24, pady=10)
+        toolbar.pack(side="top", fill="x")
+        tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
 
-        # 2. Кнопка истории продаж
+        # Кнопка истории реализации выбранного контрагента
         history_btn = StyledButton(
-            btn_box,
+            toolbar,
             text="История продаж",
             bg="#0284C7",
             fg="#FFFFFF",
             hover_bg="#0369A1",
             font=("Arial", 11, "bold"),
             padx=16,
-            pady=8,
+            pady=7,
             command=self.open_history_window
         )
-        history_btn.pack(side="left", padx=(0, 10))
+        history_btn.pack(side="left", padx=(0, 12))
 
-        # 3. Кнопка обновления
+        # Кнопка вызова калькулятора материалов
+        calc_btn = StyledButton(
+            toolbar,
+            text="Калькулятор материалов",
+            bg="#059669",
+            fg="#FFFFFF",
+            hover_bg="#047857",
+            font=("Arial", 11, "bold"),
+            padx=16,
+            pady=7,
+            command=self.open_calculator_window
+        )
+        calc_btn.pack(side="left", padx=(0, 12))
+
+        # Кнопка обновления реестра
         refresh_btn = StyledButton(
-            btn_box,
-            text="Обновить",
+            toolbar,
+            text="Обновить список",
             bg="#E2E8F0",
             fg="#1E293B",
             hover_bg="#CBD5E1",
             font=("Arial", 11),
             padx=14,
-            pady=8,
+            pady=7,
             command=self.refresh_partners
         )
-        refresh_btn.pack(side="left", padx=(0, 10))
+        refresh_btn.pack(side="left")
 
-        # 4. Кнопка добавления
-        add_btn = StyledButton(
-            btn_box,
-            text="+ Добавить партнера",
-            bg="#2A73C6",
-            fg="#FFFFFF",
-            hover_bg="#1E5BA3",
-            font=("Arial", 11, "bold"),
-            padx=18,
-            pady=8,
-            command=self.open_add_window
+        # Подсказка пользователю справа
+        hint_lbl = tk.Label(
+            toolbar,
+            text="* Двойной клик по строке для редактирования карточки",
+            font=("Arial", 10, "italic"),
+            bg="#FFFFFF",
+            fg="#64748B"
         )
-        add_btn.pack(side="left")
+        hint_lbl.pack(side="right", pady=6)
 
     def _build_table(self):
         container = tk.Frame(self, bg="#F4F6F9", padx=24, pady=16)

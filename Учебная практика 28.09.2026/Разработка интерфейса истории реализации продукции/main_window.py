@@ -88,6 +88,23 @@ class MainWindow(tk.Tk):
         header.pack(side="top", fill="x")
         tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
 
+        # Кнопка добавления партнера справа в шапке (упаковывается первой)
+        right_header_box = tk.Frame(header, bg="#FFFFFF")
+        right_header_box.pack(side="right", padx=(16, 0))
+
+        add_btn = StyledButton(
+            right_header_box,
+            text="+ Добавить партнера",
+            bg="#2A73C6",
+            fg="#FFFFFF",
+            hover_bg="#1E5BA3",
+            font=("Arial", 11, "bold"),
+            padx=18,
+            pady=8,
+            command=self.open_add_window
+        )
+        add_btn.pack(side="right")
+
         # Логотип компании в шапке с сохранением пропорций
         if os.path.exists(self.logo_path):
             try:
@@ -103,8 +120,9 @@ class MainWindow(tk.Tk):
             except Exception:
                 pass
 
+        # Заголовок реестра
         title_box = tk.Frame(header, bg="#FFFFFF")
-        title_box.pack(side="left")
+        title_box.pack(side="left", fill="x", expand=True)
 
         title_lbl = tk.Label(
             title_box,
@@ -124,48 +142,49 @@ class MainWindow(tk.Tk):
         )
         subtitle_lbl.pack(anchor="w")
 
-        btn_box = tk.Frame(header, bg="#FFFFFF")
-        btn_box.pack(side="right")
+        # Панель быстрых действий над таблицей
+        self._build_toolbar()
 
-        # Кнопка истории продаж выбранного контрагента
+    def _build_toolbar(self):
+        """Панель быстрых действий над реестром партнеров."""
+        toolbar = tk.Frame(self, bg="#FFFFFF", padx=24, pady=10)
+        toolbar.pack(side="top", fill="x")
+        tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
+
         history_btn = StyledButton(
-            btn_box,
+            toolbar,
             text="История продаж",
             bg="#0284C7",
             fg="#FFFFFF",
             hover_bg="#0369A1",
             font=("Arial", 11, "bold"),
             padx=16,
-            pady=8,
+            pady=7,
             command=self.open_history_window
         )
-        history_btn.pack(side="left", padx=(0, 10))
+        history_btn.pack(side="left", padx=(0, 12))
 
         refresh_btn = StyledButton(
-            btn_box,
-            text="Обновить",
+            toolbar,
+            text="Обновить список",
             bg="#E2E8F0",
             fg="#1E293B",
             hover_bg="#CBD5E1",
             font=("Arial", 11),
             padx=14,
-            pady=8,
+            pady=7,
             command=self.refresh_partners
         )
-        refresh_btn.pack(side="left", padx=(0, 10))
+        refresh_btn.pack(side="left")
 
-        add_btn = StyledButton(
-            btn_box,
-            text="+ Добавить партнера",
-            bg="#2A73C6",
-            fg="#FFFFFF",
-            hover_bg="#1E5BA3",
-            font=("Arial", 11, "bold"),
-            padx=18,
-            pady=8,
-            command=self.open_add_window
+        hint_lbl = tk.Label(
+            toolbar,
+            text="* Выберите партнера в таблице для просмотра детальной истории",
+            font=("Arial", 10, "italic"),
+            bg="#FFFFFF",
+            fg="#64748B"
         )
-        add_btn.pack(side="left")
+        hint_lbl.pack(side="right", pady=6)
 
     def _build_table(self):
         container = tk.Frame(self, bg="#F4F6F9", padx=24, pady=16)
