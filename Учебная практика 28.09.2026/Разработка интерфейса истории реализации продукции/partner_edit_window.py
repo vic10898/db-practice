@@ -133,8 +133,8 @@ class PartnerEditWindow(tk.Toplevel):
         else:
             self.title("CRM: Карточка партнера [Редактирование]")
 
-        self.geometry("560x640")
-        self.minsize(500, 560)
+        self.geometry("600x720")
+        self.minsize(540, 640)
         self.configure(bg="#F4F6F9")
 
         self.protocol("WM_DELETE_WINDOW", self.on_back_clicked)
@@ -159,14 +159,14 @@ class PartnerEditWindow(tk.Toplevel):
             else f"Карточка партнера #{self.partner_id}"
         )
 
-        header_frame = tk.Frame(self, bg="#FFFFFF", height=60, padx=24, pady=12)
+        header_frame = tk.Frame(self, bg="#FFFFFF", height=66, padx=24, pady=12)
         header_frame.pack(side="top", fill="x")
         tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
 
         title_lbl = tk.Label(
             header_frame,
             text=header_text,
-            font=("Arial", 14, "bold"),
+            font=("Arial", 16, "bold"),
             bg="#FFFFFF",
             fg="#111827"
         )
@@ -178,49 +178,49 @@ class PartnerEditWindow(tk.Toplevel):
 
         self._label(container, "Наименование организации *:")
         self.entry_name = tk.Entry(
-            container, font=("Arial", 10), bg="#FFFFFF", fg="#111827",
+            container, font=("Arial", 12), bg="#FFFFFF", fg="#111827",
             insertbackground="#111827", relief="solid", bd=1, highlightthickness=0
         )
-        self.entry_name.pack(fill="x", pady=(0, 8), ipady=4)
+        self.entry_name.pack(fill="x", pady=(0, 10), ipady=4)
 
         self._label(container, "Организационно-правовая форма (Тип) *:")
-        self.combo_type = ttk.Combobox(container, values=self.PARTNER_TYPES, state="readonly", font=("Arial", 10))
+        self.combo_type = ttk.Combobox(container, values=self.PARTNER_TYPES, state="readonly", font=("Arial", 12))
         self.combo_type.current(1)
-        self.combo_type.pack(fill="x", pady=(0, 8), ipady=3)
+        self.combo_type.pack(fill="x", pady=(0, 10), ipady=3)
 
         self._label(container, "Рейтинг (целое неотрицательное число от 0) *:")
         self.entry_rating = tk.Entry(
-            container, font=("Arial", 10), bg="#FFFFFF", fg="#111827",
+            container, font=("Arial", 12), bg="#FFFFFF", fg="#111827",
             insertbackground="#111827", relief="solid", bd=1, highlightthickness=0
         )
         self.entry_rating.insert(0, "0")
-        self.entry_rating.pack(fill="x", pady=(0, 8), ipady=4)
+        self.entry_rating.pack(fill="x", pady=(0, 10), ipady=4)
 
         self._label(container, "Адрес компании:")
         self.entry_address = tk.Entry(
-            container, font=("Arial", 10), bg="#FFFFFF", fg="#111827",
+            container, font=("Arial", 12), bg="#FFFFFF", fg="#111827",
             insertbackground="#111827", relief="solid", bd=1, highlightthickness=0
         )
-        self.entry_address.pack(fill="x", pady=(0, 8), ipady=4)
+        self.entry_address.pack(fill="x", pady=(0, 10), ipady=4)
 
         self._label(container, "ФИО руководителя компании:")
         self.entry_director = tk.Entry(
-            container, font=("Arial", 10), bg="#FFFFFF", fg="#111827",
+            container, font=("Arial", 12), bg="#FFFFFF", fg="#111827",
             insertbackground="#111827", relief="solid", bd=1, highlightthickness=0
         )
-        self.entry_director.pack(fill="x", pady=(0, 8), ipady=4)
+        self.entry_director.pack(fill="x", pady=(0, 10), ipady=4)
 
         self._label(container, "Контактный телефон:")
-        self.entry_phone = PlaceholderEntry(container, placeholder="+7 (999) 000-00-00", font=("Arial", 10))
-        self.entry_phone.pack(fill="x", pady=(0, 8), ipady=4)
+        self.entry_phone = PlaceholderEntry(container, placeholder="+7 (999) 000-00-00", font=("Arial", 12))
+        self.entry_phone.pack(fill="x", pady=(0, 10), ipady=4)
 
         self._label(container, "Email для связи *:")
-        self.entry_email = PlaceholderEntry(container, placeholder="info@company.ru", font=("Arial", 10))
-        self.entry_email.pack(fill="x", pady=(0, 8), ipady=4)
+        self.entry_email = PlaceholderEntry(container, placeholder="info@company.ru", font=("Arial", 12))
+        self.entry_email.pack(fill="x", pady=(0, 10), ipady=4)
 
     def _label(self, parent, text):
-        lbl = tk.Label(parent, text=text, font=("Arial", 9, "bold"), bg="#F4F6F9", fg="#374151", anchor="w")
-        lbl.pack(fill="x", pady=(2, 2))
+        lbl = tk.Label(parent, text=text, font=("Arial", 11, "bold"), bg="#F4F6F9", fg="#374151", anchor="w")
+        lbl.pack(fill="x", pady=(2, 3))
 
     def _build_buttons(self):
         tk.Frame(self, bg="#E5E7EB", height=1).pack(side="bottom", fill="x")
@@ -233,9 +233,9 @@ class PartnerEditWindow(tk.Toplevel):
             bg="#E2E8F0",
             fg="#1E293B",
             hover_bg="#CBD5E1",
-            font=("Arial", 10),
+            font=("Arial", 11),
             padx=18,
-            pady=6,
+            pady=8,
             command=self.on_back_clicked
         )
         cancel_btn.pack(side="left")
@@ -246,7 +246,7 @@ class PartnerEditWindow(tk.Toplevel):
             bg="#2A73C6",
             fg="#FFFFFF",
             hover_bg="#1E5BA3",
-            font=("Arial", 10, "bold"),
+            font=("Arial", 11, "bold"),
             padx=22,
             pady=6,
             command=self.save_data

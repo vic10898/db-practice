@@ -29,8 +29,8 @@ class MainWindow(tk.Tk):
         self.calc_window = None
 
         self.title("CRM: Реестр партнеров и расчет материалов")
-        self.geometry("1060x680")
-        self.minsize(900, 540)
+        self.geometry("1120x720")
+        self.minsize(960, 560)
         self.configure(bg="#F4F6F9")
 
         # Ресурсы оформления
@@ -68,14 +68,14 @@ class MainWindow(tk.Tk):
             background="#FFFFFF",
             foreground="#111827",
             fieldbackground="#FFFFFF",
-            font=("Arial", 10),
-            rowheight=26
+            font=("Arial", 11),
+            rowheight=32
         )
         style.configure(
             "Treeview.Heading",
             background="#F1F5F9",
             foreground="#1E293B",
-            font=("Arial", 10, "bold"),
+            font=("Arial", 11, "bold"),
             relief="flat"
         )
         style.map(
@@ -85,18 +85,22 @@ class MainWindow(tk.Tk):
         )
 
     def _build_header(self):
-        header = tk.Frame(self, bg="#FFFFFF", height=72, padx=24, pady=12)
+        header = tk.Frame(self, bg="#FFFFFF", height=78, padx=24, pady=12)
         header.pack(side="top", fill="x")
         tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
 
+        # Логотип компании с сохранением пропорций сторон
         if os.path.exists(self.logo_path):
             try:
                 pil_logo = Image.open(self.logo_path)
-                pil_logo = pil_logo.resize((48, 48), Image.Resampling.LANCZOS)
+                orig_w, orig_h = pil_logo.size
+                target_h = 44
+                target_w = int(orig_w * (target_h / orig_h))
+                pil_logo = pil_logo.resize((target_w, target_h), Image.Resampling.LANCZOS)
                 logo_img = ImageTk.PhotoImage(pil_logo)
                 logo_lbl = tk.Label(header, image=logo_img, bg="#FFFFFF")
                 logo_lbl.image = logo_img
-                logo_lbl.pack(side="left", padx=(0, 16))
+                logo_lbl.pack(side="left", padx=(0, 18))
             except Exception:
                 pass
 
@@ -106,7 +110,7 @@ class MainWindow(tk.Tk):
         title_lbl = tk.Label(
             title_box,
             text="Реестр партнеров",
-            font=("Arial", 16, "bold"),
+            font=("Arial", 18, "bold"),
             bg="#FFFFFF",
             fg="#111827"
         )
@@ -115,7 +119,7 @@ class MainWindow(tk.Tk):
         subtitle_lbl = tk.Label(
             title_box,
             text="Управление контрагентами, история реализации и расчет расхода сырья",
-            font=("Arial", 9),
+            font=("Arial", 11),
             bg="#FFFFFF",
             fg="#6B7280"
         )
@@ -131,9 +135,9 @@ class MainWindow(tk.Tk):
             bg="#059669",
             fg="#FFFFFF",
             hover_bg="#047857",
-            font=("Arial", 10, "bold"),
-            padx=14,
-            pady=7,
+            font=("Arial", 11, "bold"),
+            padx=16,
+            pady=8,
             command=self.open_calculator_window
         )
         calc_btn.pack(side="left", padx=(0, 10))
@@ -145,9 +149,9 @@ class MainWindow(tk.Tk):
             bg="#0284C7",
             fg="#FFFFFF",
             hover_bg="#0369A1",
-            font=("Arial", 10, "bold"),
-            padx=14,
-            pady=7,
+            font=("Arial", 11, "bold"),
+            padx=16,
+            pady=8,
             command=self.open_history_window
         )
         history_btn.pack(side="left", padx=(0, 10))
@@ -159,9 +163,9 @@ class MainWindow(tk.Tk):
             bg="#E2E8F0",
             fg="#1E293B",
             hover_bg="#CBD5E1",
-            font=("Arial", 10),
+            font=("Arial", 11),
             padx=14,
-            pady=7,
+            pady=8,
             command=self.refresh_partners
         )
         refresh_btn.pack(side="left", padx=(0, 10))
@@ -173,8 +177,9 @@ class MainWindow(tk.Tk):
             bg="#2A73C6",
             fg="#FFFFFF",
             hover_bg="#1E5BA3",
-            padx=16,
-            pady=7,
+            font=("Arial", 11, "bold"),
+            padx=18,
+            pady=8,
             command=self.open_add_window
         )
         add_btn.pack(side="left")
@@ -196,15 +201,15 @@ class MainWindow(tk.Tk):
         self.tree.heading("discount", text="Скидка")
         self.tree.heading("rating", text="Рейтинг")
 
-        self.tree.column("id", width=40, anchor="center")
-        self.tree.column("type", width=65, anchor="center")
-        self.tree.column("name", width=200, anchor="w")
-        self.tree.column("director", width=160, anchor="w")
-        self.tree.column("phone", width=130, anchor="center")
-        self.tree.column("email", width=155, anchor="w")
-        self.tree.column("sales", width=95, anchor="e")
-        self.tree.column("discount", width=70, anchor="center")
-        self.tree.column("rating", width=65, anchor="center")
+        self.tree.column("id", width=45, anchor="center")
+        self.tree.column("type", width=75, anchor="center")
+        self.tree.column("name", width=230, anchor="w")
+        self.tree.column("director", width=180, anchor="w")
+        self.tree.column("phone", width=155, anchor="center")
+        self.tree.column("email", width=180, anchor="w")
+        self.tree.column("sales", width=110, anchor="e")
+        self.tree.column("discount", width=80, anchor="center")
+        self.tree.column("rating", width=75, anchor="center")
 
         scrollbar = ttk.Scrollbar(container, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=scrollbar.set)
@@ -222,7 +227,7 @@ class MainWindow(tk.Tk):
         self.status_lbl = tk.Label(
             status_frame,
             text="Инициализация базы данных...",
-            font=("Arial", 9),
+            font=("Arial", 11),
             bg="#FFFFFF",
             fg="#4B5563"
         )

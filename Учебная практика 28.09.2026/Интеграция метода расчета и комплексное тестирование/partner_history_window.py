@@ -31,8 +31,8 @@ class PartnerHistoryWindow(tk.Toplevel):
 
         partner_title = self.partner_data["company_name"]
         self.title(f"CRM: История реализации продукции — {partner_title}")
-        self.geometry("780x560")
-        self.minsize(680, 440)
+        self.geometry("860x600")
+        self.minsize(760, 500)
         self.configure(bg="#F4F6F9")
 
         # Определение путей к ресурсам оформления
@@ -77,14 +77,14 @@ class PartnerHistoryWindow(tk.Toplevel):
             background="#FFFFFF",
             foreground="#111827",
             fieldbackground="#FFFFFF",
-            font=("Arial", 10),
-            rowheight=28
+            font=("Arial", 11),
+            rowheight=32
         )
         style.configure(
             "History.Treeview.Heading",
             background="#F1F5F9",
             foreground="#1E293B",
-            font=("Arial", 10, "bold"),
+            font=("Arial", 11, "bold"),
             relief="flat"
         )
         style.map(
@@ -95,21 +95,24 @@ class PartnerHistoryWindow(tk.Toplevel):
 
     def _build_header(self):
         """Формирование шапки окна с логотипом компании и заголовком."""
-        header_frame = tk.Frame(self, bg="#FFFFFF", height=70, padx=20, pady=10)
+        header_frame = tk.Frame(self, bg="#FFFFFF", height=76, padx=20, pady=12)
         header_frame.pack(side="top", fill="x")
 
         # Разделительная полоса
         tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
 
-        # Логотип компании
+        # Логотип компании с сохранением пропорций
         if os.path.exists(self.logo_path):
             try:
                 pil_logo = Image.open(self.logo_path)
-                pil_logo = pil_logo.resize((48, 48), Image.Resampling.LANCZOS)
+                orig_w, orig_h = pil_logo.size
+                target_h = 44
+                target_w = int(orig_w * (target_h / orig_h))
+                pil_logo = pil_logo.resize((target_w, target_h), Image.Resampling.LANCZOS)
                 logo_img = ImageTk.PhotoImage(pil_logo)
                 logo_label = tk.Label(header_frame, image=logo_img, bg="#FFFFFF")
                 logo_label.image = logo_img
-                logo_label.pack(side="left", padx=(0, 16))
+                logo_label.pack(side="left", padx=(0, 18))
             except Exception:
                 pass
 
@@ -119,7 +122,7 @@ class PartnerHistoryWindow(tk.Toplevel):
         header_title = tk.Label(
             title_box,
             text=f"История реализации: {self.partner_data['company_name']}",
-            font=("Arial", 14, "bold"),
+            font=("Arial", 16, "bold"),
             bg="#FFFFFF",
             fg="#111827"
         )
@@ -128,7 +131,7 @@ class PartnerHistoryWindow(tk.Toplevel):
         header_sub = tk.Label(
             title_box,
             text=f"Тип: {self.partner_data['partner_type']} | Руководитель: {self.partner_data.get('director', '—')}",
-            font=("Arial", 9),
+            font=("Arial", 11),
             bg="#FFFFFF",
             fg="#6B7280"
         )
@@ -138,11 +141,11 @@ class PartnerHistoryWindow(tk.Toplevel):
         close_btn = tk.Label(
             header_frame,
             text="Назад к списку",
-            font=("Arial", 9, "bold"),
+            font=("Arial", 11, "bold"),
             bg="#E2E8F0",
             fg="#1E293B",
-            padx=14,
-            pady=6,
+            padx=16,
+            pady=7,
             cursor="hand2"
         )
         close_btn.bind("<Button-1>", lambda e: self.destroy())
@@ -162,7 +165,7 @@ class PartnerHistoryWindow(tk.Toplevel):
         self.summary_lbl = tk.Label(
             inner_card,
             text="Загрузка сводных данных по продажам...",
-            font=("Arial", 10),
+            font=("Arial", 11),
             bg="#FFFFFF",
             fg="#334155"
         )
@@ -205,7 +208,7 @@ class PartnerHistoryWindow(tk.Toplevel):
         self.footer_lbl = tk.Label(
             footer_frame,
             text="",
-            font=("Arial", 9),
+            font=("Arial", 11),
             bg="#FFFFFF",
             fg="#4B5563"
         )

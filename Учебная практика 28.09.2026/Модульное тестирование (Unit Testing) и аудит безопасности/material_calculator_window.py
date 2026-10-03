@@ -22,8 +22,8 @@ class MaterialCalculatorWindow(tk.Toplevel):
         self.db = db_manager or DatabaseManager()
 
         self.title("CRM: Калькулятор расхода материалов")
-        self.geometry("620x680")
-        self.minsize(560, 600)
+        self.geometry("680x740")
+        self.minsize(620, 680)
         self.configure(bg="#F4F6F9")
 
         # Каталог графических ресурсов оформления
@@ -56,8 +56,8 @@ class MaterialCalculatorWindow(tk.Toplevel):
                 pass
 
     def _build_header(self):
-        """Формирование шапки калькулятора с логотипом компании."""
-        header_frame = tk.Frame(self, bg="#FFFFFF", height=68, padx=20, pady=12)
+        """Формирование шапки калькулятора с корректными пропорциями логотипа компании."""
+        header_frame = tk.Frame(self, bg="#FFFFFF", height=76, padx=20, pady=12)
         header_frame.pack(side="top", fill="x")
 
         tk.Frame(self, bg="#E5E7EB", height=1).pack(side="top", fill="x")
@@ -65,11 +65,15 @@ class MaterialCalculatorWindow(tk.Toplevel):
         if os.path.exists(self.logo_path):
             try:
                 pil_logo = Image.open(self.logo_path)
-                pil_logo = pil_logo.resize((44, 44), Image.Resampling.LANCZOS)
+                # Масштабирование с сохранением исходных пропорций сторон (aspect ratio)
+                orig_w, orig_h = pil_logo.size
+                target_h = 44
+                target_w = int(orig_w * (target_h / orig_h))
+                pil_logo = pil_logo.resize((target_w, target_h), Image.Resampling.LANCZOS)
                 logo_img = ImageTk.PhotoImage(pil_logo)
                 logo_label = tk.Label(header_frame, image=logo_img, bg="#FFFFFF")
                 logo_label.image = logo_img
-                logo_label.pack(side="left", padx=(0, 14))
+                logo_label.pack(side="left", padx=(0, 18))
             except Exception:
                 pass
 
@@ -79,7 +83,7 @@ class MaterialCalculatorWindow(tk.Toplevel):
         title_lbl = tk.Label(
             title_box,
             text="Калькулятор расхода материалов",
-            font=("Arial", 14, "bold"),
+            font=("Arial", 16, "bold"),
             bg="#FFFFFF",
             fg="#111827"
         )
@@ -88,7 +92,7 @@ class MaterialCalculatorWindow(tk.Toplevel):
         sub_lbl = tk.Label(
             title_box,
             text="Нормативный расчет сырья с учетом коэффициентов и процента брака",
-            font=("Arial", 9),
+            font=("Arial", 11),
             bg="#FFFFFF",
             fg="#6B7280"
         )
@@ -101,18 +105,18 @@ class MaterialCalculatorWindow(tk.Toplevel):
 
         # 1. Выбор типа продукции
         self._create_label(container, "Тип выпускаемой продукции *:")
-        self.combo_product_type = ttk.Combobox(container, state="readonly", font=("Arial", 10))
-        self.combo_product_type.pack(fill="x", pady=(0, 12))
+        self.combo_product_type = ttk.Combobox(container, state="readonly", font=("Arial", 12))
+        self.combo_product_type.pack(fill="x", pady=(0, 14))
 
         # 2. Выбор типа материала
         self._create_label(container, "Тип используемого материала (сырья) *:")
-        self.combo_material_type = ttk.Combobox(container, state="readonly", font=("Arial", 10))
-        self.combo_material_type.pack(fill="x", pady=(0, 12))
+        self.combo_material_type = ttk.Combobox(container, state="readonly", font=("Arial", 12))
+        self.combo_material_type.pack(fill="x", pady=(0, 14))
 
         # 3. Объем партии
         self._create_label(container, "Планируемое количество продукции (шт.) *:")
-        self.entry_quantity = tk.Entry(container, font=("Arial", 10), relief="solid", bd=1)
-        self.entry_quantity.pack(fill="x", pady=(0, 12))
+        self.entry_quantity = tk.Entry(container, font=("Arial", 12), relief="solid", bd=1)
+        self.entry_quantity.pack(fill="x", pady=(0, 14))
 
         # 4. Физические параметры изделия
         params_row = tk.Frame(container, bg="#F4F6F9")
@@ -121,13 +125,13 @@ class MaterialCalculatorWindow(tk.Toplevel):
         col1 = tk.Frame(params_row, bg="#F4F6F9")
         col1.pack(side="left", fill="x", expand=True, padx=(0, 8))
         self._create_label(col1, "Параметр 1 (длина/размер, м) *:")
-        self.entry_param1 = tk.Entry(col1, font=("Arial", 10), relief="solid", bd=1)
+        self.entry_param1 = tk.Entry(col1, font=("Arial", 12), relief="solid", bd=1)
         self.entry_param1.pack(fill="x")
 
         col2 = tk.Frame(params_row, bg="#F4F6F9")
         col2.pack(side="left", fill="x", expand=True, padx=(8, 0))
         self._create_label(col2, "Параметр 2 (ширина/высота, м) *:")
-        self.entry_param2 = tk.Entry(col2, font=("Arial", 10), relief="solid", bd=1)
+        self.entry_param2 = tk.Entry(col2, font=("Arial", 12), relief="solid", bd=1)
         self.entry_param2.pack(fill="x")
 
         # Кнопки управления
@@ -140,9 +144,9 @@ class MaterialCalculatorWindow(tk.Toplevel):
             bg="#2A73C6",
             fg="#FFFFFF",
             hover_bg="#1E5BA3",
-            font=("Arial", 10, "bold"),
-            padx=18,
-            pady=8,
+            font=("Arial", 11, "bold"),
+            padx=20,
+            pady=9,
             command=self.perform_calculation
         )
         calc_btn.pack(side="left", padx=(0, 10))
@@ -153,9 +157,9 @@ class MaterialCalculatorWindow(tk.Toplevel):
             bg="#E2E8F0",
             fg="#1E293B",
             hover_bg="#CBD5E1",
-            font=("Arial", 10),
-            padx=14,
-            pady=8,
+            font=("Arial", 11),
+            padx=16,
+            pady=9,
             command=self.reset_form
         )
         clear_btn.pack(side="left")
@@ -164,11 +168,11 @@ class MaterialCalculatorWindow(tk.Toplevel):
         lbl = tk.Label(
             parent,
             text=text,
-            font=("Arial", 9, "bold"),
+            font=("Arial", 11, "bold"),
             bg="#F4F6F9",
             fg="#374151"
         )
-        lbl.pack(anchor="w", pady=(0, 4))
+        lbl.pack(anchor="w", pady=(0, 5))
         return lbl
 
     def _build_result_panel(self):
@@ -183,7 +187,7 @@ class MaterialCalculatorWindow(tk.Toplevel):
         result_header = tk.Label(
             card,
             text="Результат расчета расхода сырья:",
-            font=("Arial", 11, "bold"),
+            font=("Arial", 13, "bold"),
             bg="#FFFFFF",
             fg="#1E293B"
         )
@@ -192,7 +196,7 @@ class MaterialCalculatorWindow(tk.Toplevel):
         self.result_value_lbl = tk.Label(
             card,
             text="—",
-            font=("Arial", 22, "bold"),
+            font=("Arial", 26, "bold"),
             bg="#FFFFFF",
             fg="#2A73C6"
         )
@@ -201,7 +205,7 @@ class MaterialCalculatorWindow(tk.Toplevel):
         self.details_lbl = tk.Label(
             card,
             text="Заполните параметры изделия и нажмите «Рассчитать потребность сырья».",
-            font=("Arial", 9),
+            font=("Arial", 11),
             bg="#FFFFFF",
             fg="#6B7280",
             justify="left"
