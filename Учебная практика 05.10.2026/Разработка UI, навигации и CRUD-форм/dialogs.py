@@ -77,40 +77,50 @@ class CustomDiscardDialog(tk.Toplevel):
         btn_bar = tk.Frame(self, bg="#F9FAFB", padx=16, pady=12)
         btn_bar.pack(side="bottom", fill="x")
 
-        cancel_btn = tk.Button(
-            btn_bar,
-            text="Отмена (остаться)",
-            font=("Arial", 10),
-            bg="#FFFFFF",
-            fg="#374151",
-            relief="solid",
-            bd=1,
-            padx=14,
-            pady=6,
-            command=self._on_cancel
-        )
-        cancel_btn.pack(side="right", padx=(8, 0))
-
-        confirm_btn = tk.Button(
+        # Кнопка подтверждения выхода (яркий красный цвет с белым текстом)
+        confirm_btn = tk.Label(
             btn_bar,
             text="Да, выйти",
             font=("Arial", 10, "bold"),
             bg="#DC2626",
             fg="#FFFFFF",
+            padx=16,
+            pady=7,
+            cursor="hand2",
             relief="solid",
-            bd=0,
-            padx=14,
-            pady=6,
-            command=self._on_confirm
+            bd=0
         )
+        confirm_btn.bind("<Button-1>", lambda e: self._on_confirm())
+        confirm_btn.bind("<Enter>", lambda e: confirm_btn.configure(bg="#B91C1C"))
+        confirm_btn.bind("<Leave>", lambda e: confirm_btn.configure(bg="#DC2626"))
         confirm_btn.pack(side="right")
+
+        # Кнопка «Отмена (остаться)»
+        cancel_btn = tk.Label(
+            btn_bar,
+            text="Отмена (остаться)",
+            font=("Arial", 10),
+            bg="#E2E8F0",
+            fg="#1E293B",
+            padx=14,
+            pady=7,
+            cursor="hand2",
+            relief="solid",
+            bd=0
+        )
+        cancel_btn.bind("<Button-1>", lambda e: self._on_cancel())
+        cancel_btn.bind("<Enter>", lambda e: cancel_btn.configure(bg="#CBD5E1"))
+        cancel_btn.bind("<Leave>", lambda e: cancel_btn.configure(bg="#E2E8F0"))
+        cancel_btn.pack(side="right", padx=(0, 10))
 
     def _on_confirm(self):
         self.result = True
+        self.grab_release()
         self.destroy()
 
     def _on_cancel(self):
         self.result = False
+        self.grab_release()
         self.destroy()
 
 
